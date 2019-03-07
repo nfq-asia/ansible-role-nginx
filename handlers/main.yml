@@ -1,5 +1,5 @@
 ---
-# handlers file for nginx
+# handlers file for ansible-role-nginx
 - name: start nginx
   systemd:
     name: nginx
