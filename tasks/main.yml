@@ -1,0 +1,9 @@
+---
+# tasks file for nginx
+- include: install.yml
+  tags:
+    - install
+
+- include: configure.yml
+  tags:
+    - config
