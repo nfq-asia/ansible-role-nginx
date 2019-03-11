@@ -46,3 +46,7 @@
 
 - name: force all notified handlers to run at this point, for applying all nginx configs
   meta: flush_handlers
+
+- name: Debug ansible gathering facts on remote machine
+  debug: 
+    var: ansible_facts
