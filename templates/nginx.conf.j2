@@ -57,6 +57,7 @@ http {
 		image/svg+xml;
 
 	server {
+		# using curl 127.0.0.1/nginx_status for checking nginx status
 		location /nginx_status {
 			stub_status;
 			access_log off;
