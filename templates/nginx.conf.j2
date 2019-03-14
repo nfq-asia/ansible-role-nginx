@@ -1,22 +1,27 @@
 user www-data;
+
 worker_processes auto;
+worker_cpu_affinity auto;
+worker_rlimit_nofile 100000;
+
 pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
 
 events {
-	worker_connections 768;
-	# multi_accept on;
+	worker_connections 4096;
 }
 
 http {
 	sendfile on;
 	tcp_nopush on;
 	tcp_nodelay on;
-	keepalive_timeout 65;
+
+	keepalive_timeout 100;
+	client_body_timeout 120;
+	reset_timedout_connection on;
 	types_hash_max_size 2048;
-	# server_tokens off;
-	# server_names_hash_bucket_size 64;
-	# server_name_in_redirect off;
+
+	server_tokens off; #hide nginx version number
 
 	include /etc/nginx/mime.types;
 	default_type application/octet-stream;
@@ -29,13 +34,28 @@ http {
 
 	gzip on;
 	gzip_disable "msie6";
-
 	gzip_vary on;
 	gzip_proxied any;
 	gzip_comp_level 6;
 	gzip_buffers 16 8k;
 	gzip_http_version 1.1;
-	gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+	gzip_types
+		text/html
+		text/plain
+		text/css
+		text/javascript
+		text/xml
+		text/x-component
+		application/javascript
+		application/x-javascript
+		application/json
+		application/xml
+		application/rss+xml
+		application/atom+xml
+		font/truetype
+		font/opentype
+		application/vnd.ms-fontobject
+		image/svg+xml;
 
 	server {
 		location /nginx_status {
