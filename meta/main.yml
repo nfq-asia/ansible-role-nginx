@@ -1,12 +1,12 @@
+---
 galaxy_info:
   author: Hieu Huynh
   description: Ansible playbook to setup Nginx stable version
   company: NFQ.asia
   platforms:
-  - name: Ubuntu
-    versions:
-      - 18.04 minmal
+    - name: Ubuntu
+      versions:
+        - 18.04 minmal
   license: MIT
   min_ansible_version: 1.2
   galaxy_tags: []
-

@@ -23,7 +23,7 @@
     src: "nginx.conf.j2"
     dest: "/etc/nginx/nginx.conf"
   notify:
-   - validate nginx
+    - validate nginx
 
 - name: force all notified handlers to run at this point, for validating nginx.conf
   meta: flush_handlers
@@ -41,8 +41,8 @@
     src: files/
     dest: /etc/nginx/conf.d/
   notify:
-   - validate nginx
-   - reload nginx
+    - validate nginx
+    - reload nginx
 
 - name: force all notified handlers to run at this point, for applying all nginx configs
   meta: flush_handlers
