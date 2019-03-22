@@ -1,14 +1,14 @@
-user www-data;
+user {{ nginx_user }};
 
-worker_processes auto;
-worker_cpu_affinity auto;
-worker_rlimit_nofile 100000;
+worker_processes {{ nginx_worker_processes }};
+worker_cpu_affinity {{ nginx_worker_cpu_affinity }};
+worker_rlimit_nofile {{ nginx_worker_rlimit_nofile }};
 
 pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
 
 events {
-	worker_connections 4096;
+	worker_connections {{ nginx_worker_connections }};
 }
 
 http {
@@ -16,18 +16,21 @@ http {
 	tcp_nopush on;
 	tcp_nodelay on;
 
-	keepalive_timeout 100;
-	client_body_timeout 120;
-	reset_timedout_connection on;
-	types_hash_max_size 2048;
+	keepalive_timeout {{ nginx_keepalive_timeout }};
+	client_body_timeout {{ nginx_client_body_timeout }};
+	reset_timedout_connection {{ nginx_reset_timedout_connection }};
+	types_hash_max_size {{ nginx_types_hash_max_size }};
+	client_max_body_size {{ nginx_client_max_body_size }};
 
-	server_tokens off; #hide nginx version number
+	server_tokens {{ nginx_server_tokens }};
 
 	include /etc/nginx/mime.types;
 	default_type application/octet-stream;
 
-	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+	ssl_protocols {{ nginx_ssl_protocols }}; 
 	ssl_prefer_server_ciphers on;
+
+	{% if nginx_apm_log_enabled %}
 
 	# Docs: https://www.nginx.com/blog/using-nginx-logging-for-application-performance-monitoring/
 	log_format apm 'timestamp="$time_local" client=$remote_addr '
@@ -49,6 +52,13 @@ http {
 
 	access_log /var/log/nginx/access.log apm;
 	error_log /var/log/nginx/error.log;
+
+	{% else %}
+
+	access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+
+	{% endif %}
 
 	gzip on;
 	gzip_disable "msie6";
@@ -74,6 +84,7 @@ http {
 		application/vnd.ms-fontobject
 		image/svg+xml;
 
+	{% if nginx_status_enabled %}
 	server {
 		# using curl 127.0.0.1/nginx_status for checking nginx status
 		location /nginx_status {
@@ -83,6 +94,7 @@ http {
 			deny all;
 		}
 	}
+	{% endif %}
 
 	include /etc/nginx/conf.d/*.conf;
 	include /etc/nginx/sites-enabled/*;
