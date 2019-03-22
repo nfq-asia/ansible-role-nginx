@@ -19,8 +19,15 @@
     stat: path=/etc/nginx/conf.d
     register: nginx_vhosts
   - name: Backup - backing up conf.d
-    command: mv /etc/nginx/conf.d/* /etc/nginx/backup/{{ ansible_date_time.iso8601 }}/
+    command: mv /etc/nginx/conf.d /etc/nginx/backup/{{ ansible_date_time.iso8601 }}/
     when: nginx_vhosts.stat.exists and nginx_vhosts.stat.isdir
+  - name: Backup - init base conf.d
+    file:
+      path: /etc/nginx/conf.d
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
 
 - name: Override nginx.conf config
   template:
