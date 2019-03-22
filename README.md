@@ -26,9 +26,11 @@ The task is to write an Ansible role to install and manage Nginx stable version 
           - proxy pass from nginx to other services inside EC2 vm (backend api, admin, ...)
   - **Configuration**:
       - _default_:
-          - all default configurations as the original of nginx 
+          - all default configurations as the original of nginx
+          - apply auto tuning for nginx.conf (worker_processes, worker_cpu_affinity, ...)
+          - apply APM log format
       - _advanced_:
-          - Flexible configure by editing config files on this repo
+          - Flexible configure by editing config files, default variables on this repo
   - **Monitoring**:
       - _default_: discuss in monitoring parts
       - _optional_: discuss in monitoring parts

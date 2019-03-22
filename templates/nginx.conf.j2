@@ -8,94 +8,90 @@ pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
 
 events {
-	worker_connections {{ nginx_worker_connections }};
+  worker_connections {{ nginx_worker_connections }};
 }
 
 http {
-	sendfile on;
-	tcp_nopush on;
-	tcp_nodelay on;
+  sendfile on;
+  tcp_nopush on;
+  tcp_nodelay on;
 
-	keepalive_timeout {{ nginx_keepalive_timeout }};
-	client_body_timeout {{ nginx_client_body_timeout }};
-	reset_timedout_connection {{ nginx_reset_timedout_connection }};
-	types_hash_max_size {{ nginx_types_hash_max_size }};
-	client_max_body_size {{ nginx_client_max_body_size }};
+  keepalive_timeout {{ nginx_keepalive_timeout }};
+  client_body_timeout {{ nginx_client_body_timeout }};
+  reset_timedout_connection {{ nginx_reset_timedout_connection }};
+  types_hash_max_size {{ nginx_types_hash_max_size }};
+  client_max_body_size {{ nginx_client_max_body_size }};
 
-	server_tokens {{ nginx_server_tokens }};
+  server_tokens {{ nginx_server_tokens }};
 
-	include /etc/nginx/mime.types;
-	default_type application/octet-stream;
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
 
-	ssl_protocols {{ nginx_ssl_protocols }}; 
-	ssl_prefer_server_ciphers on;
+  ssl_protocols {{ nginx_ssl_protocols }}; 
+  ssl_prefer_server_ciphers on;
 
-	{% if nginx_apm_log_enabled %}
+{% if nginx_apm_log_enabled %}
+  # Docs: https://www.nginx.com/blog/using-nginx-logging-for-application-performance-monitoring/
+  log_format apm 'timestamp="$time_local" client=$remote_addr '
+                 'request="$request" request_length=$request_length '
+                 'bytes_sent=$bytes_sent ' 
+                 'body_bytes_sent=$body_bytes_sent '
+                 'referer=$http_referer '
+                 'user_agent="$http_user_agent" '
+                 'upstream_addr=$upstream_addr '
+                 'upstream_status=$upstream_status '
+                 'request_time=$request_time ' 
+                 'upstream_response_time=$upstream_response_time '
+                 'upstream_connect_time=$upstream_connect_time '
+                 'upstream_header_time=$upstream_header_time '
+                 'app_db_read_time=$upstream_http_db_read_time '
+                 'app_db_write_time=$upstream_http_db_write_time '
+                 'app_analysis_time=$upstream_http_analysis_time '
+                 'app_other_time=$upstream_http_other_time ';
 
-	# Docs: https://www.nginx.com/blog/using-nginx-logging-for-application-performance-monitoring/
-	log_format apm 'timestamp="$time_local" client=$remote_addr '
-					'request="$request" request_length=$request_length '
-					'bytes_sent=$bytes_sent '
-					'body_bytes_sent=$body_bytes_sent '
-					'referer=$http_referer '
-					'user_agent="$http_user_agent" '
-					'upstream_addr=$upstream_addr '
-					'upstream_status=$upstream_status '
-					'request_time=$request_time ' 
-					'upstream_response_time=$upstream_response_time '
-					'upstream_connect_time=$upstream_connect_time '
-					'upstream_header_time=$upstream_header_time '
-					'app_db_read_time=$upstream_http_db_read_time '
-					'app_db_write_time=$upstream_http_db_write_time '
-					'app_analysis_time=$upstream_http_analysis_time '
-'					app_other_time=$upstream_http_other_time ';
+  access_log /var/log/nginx/access.log apm;
+  error_log /var/log/nginx/error.log;
+{% else %}
+  access_log /var/log/nginx/access.log;
+  error_log /var/log/nginx/error.log;
+{% endif %}
 
-	access_log /var/log/nginx/access.log apm;
-	error_log /var/log/nginx/error.log;
+  gzip on;
+  gzip_disable "msie6";
+  gzip_vary on;
+  gzip_proxied any;
+  gzip_comp_level 6;
+  gzip_buffers 16 8k;
+  gzip_http_version 1.1;
+  gzip_types
+    text/plain
+    text/css
+    text/javascript
+    text/xml
+    text/x-component
+    application/javascript
+    application/x-javascript
+    application/json
+    application/xml
+    application/rss+xml
+    application/atom+xml
+    font/truetype
+    font/opentype
+    application/vnd.ms-fontobject
+    image/svg+xml;
 
-	{% else %}
+{% if nginx_status_enabled %}
+  server {
+    # using curl 127.0.0.1/nginx_status for checking nginx status
+    location /nginx_status {
+      stub_status;
+      access_log off;
+      allow 127.0.0.1;
+      deny all;
+    }
+  }
+{% endif %}
 
-	access_log /var/log/nginx/access.log;
-	error_log /var/log/nginx/error.log;
-
-	{% endif %}
-
-	gzip on;
-	gzip_disable "msie6";
-	gzip_vary on;
-	gzip_proxied any;
-	gzip_comp_level 6;
-	gzip_buffers 16 8k;
-	gzip_http_version 1.1;
-	gzip_types
-		text/plain
-		text/css
-		text/javascript
-		text/xml
-		text/x-component
-		application/javascript
-		application/x-javascript
-		application/json
-		application/xml
-		application/rss+xml
-		application/atom+xml
-		font/truetype
-		font/opentype
-		application/vnd.ms-fontobject
-		image/svg+xml;
-
-	{% if nginx_status_enabled %}
-	server {
-		# using curl 127.0.0.1/nginx_status for checking nginx status
-		location /nginx_status {
-			stub_status;
-			access_log off;
-			allow 127.0.0.1;
-			deny all;
-		}
-	}
-	{% endif %}
-
-	include /etc/nginx/conf.d/*.conf;
-	include /etc/nginx/sites-enabled/*;
+  include /etc/nginx/conf.d/*.conf;
+  include /etc/nginx/sites-enabled/*;
 }
