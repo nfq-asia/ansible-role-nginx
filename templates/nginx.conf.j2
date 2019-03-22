@@ -43,11 +43,7 @@ http {
                  'request_time=$request_time ' 
                  'upstream_response_time=$upstream_response_time '
                  'upstream_connect_time=$upstream_connect_time '
-                 'upstream_header_time=$upstream_header_time '
-                 'app_db_read_time=$upstream_http_db_read_time '
-                 'app_db_write_time=$upstream_http_db_write_time '
-                 'app_analysis_time=$upstream_http_analysis_time '
-                 'app_other_time=$upstream_http_other_time ';
+                 'upstream_header_time=$upstream_header_time ';
 
   access_log /var/log/nginx/access.log apm;
   error_log /var/log/nginx/error.log;
