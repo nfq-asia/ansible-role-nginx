@@ -1,0 +1,29 @@
+server {
+  listen 80;
+  server_name {{ reverse_proxy_server_name }};
+
+{% if reverse_proxy_nocache_enabled %}
+  add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+  add_header Pragma 'no-cache';
+  add_header Expires 0;
+{% endif %}
+
+  access_log  {{ reverse_proxy_access_log }} apm;
+  error_log   {{ reverse_proxy_error_log }};
+
+  location / {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Host $host;
+    proxy_pass {{ reverse_proxy_pass }};
+
+{% if reverse_proxy_cors_enabled %}
+    add_header 'Access-Control-Allow-Origin' '*';
+    add_header 'Access-Control-Allow-Methods' 'GET, PUT, POST, DELETE, HEAD, OPTIONS' always;
+    add_header 'Access-Control-Allow-Credentials' 'true' always;
+    add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With';
+    add_header 'Access-Control-Allow-Headers' '*';
+{% endif %}
+
+  }
+}

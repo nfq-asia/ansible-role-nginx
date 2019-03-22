@@ -9,7 +9,7 @@ server {
   location / {
     try_files $uri {{ static_site_index }};
 
-{% if static_cors_enabled %}
+{% if static_site_cors_enabled %}
     add_header 'Access-Control-Allow-Origin' '*';
     add_header 'Access-Control-Allow-Methods' 'GET, PUT, POST, DELETE, HEAD, OPTIONS' always;
     add_header 'Access-Control-Allow-Credentials' 'true' always;
