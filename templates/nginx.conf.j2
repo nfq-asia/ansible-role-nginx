@@ -29,7 +29,7 @@ http {
 	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
 	ssl_prefer_server_ciphers on;
 
-	access_log /var/log/nginx/access.log;
+	access_log /var/log/nginx/access.log apm;
 	error_log /var/log/nginx/error.log;
 
 	gzip on;
@@ -55,6 +55,24 @@ http {
 		font/opentype
 		application/vnd.ms-fontobject
 		image/svg+xml;
+
+	# Docs: https://www.nginx.com/blog/using-nginx-logging-for-application-performance-monitoring/
+	log_format apm 'timestamp="$time_local" client=$remote_addr '
+               'request="$request" request_length=$request_length '
+               'bytes_sent=$bytes_sent '
+               'body_bytes_sent=$body_bytes_sent '
+               'referer=$http_referer '
+               'user_agent="$http_user_agent" '
+               'upstream_addr=$upstream_addr '
+               'upstream_status=$upstream_status '
+               'request_time=$request_time ' 
+               'upstream_response_time=$upstream_response_time '
+               'upstream_connect_time=$upstream_connect_time '
+               'upstream_header_time=$upstream_header_time '
+               'app_db_read_time=$upstream_http_db_read_time '
+               'app_db_write_time=$upstream_http_db_write_time '
+               'app_analysis_time=$upstream_http_analysis_time '
+               'app_other_time=$upstream_http_other_time ';
 
 	server {
 		# using curl 127.0.0.1/nginx_status for checking nginx status
