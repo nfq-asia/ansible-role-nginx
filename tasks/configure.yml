@@ -5,18 +5,22 @@
     file:
       path: /etc/nginx/backup
       state: directory
+  - name: Backup - create specific backup dir for this running
+    file:
+      path: /etc/nginx/backup/{{ ansible_date_time.iso8601 }}
+      state: directory
   - name: Backup - check stats of nginx.conf
     stat: path=/etc/nginx/nginx.conf
     register: nginx_core
   - name: Backup - backing up nginx.conf
-    command: mv /etc/nginx/nginx.conf /etc/nginx/backup/nginx.conf-backup{{ ansible_date_time.iso8601 }}
+    command: mv /etc/nginx/nginx.conf /etc/nginx/backup/{{ ansible_date_time.iso8601 }}/nginx.conf
     when: nginx_core.stat.exists
   - name: Backup - check stats of conf.d
     stat: path=/etc/nginx/conf.d
     register: nginx_vhosts
   - name: Backup - backing up conf.d
-    command: mv /etc/nginx/conf.d /etc/nginx/backup/conf.d-backup{{ ansible_date_time.iso8601 }}
-    when: nginx_vhosts.stat.exists  and nginx_vhosts.stat.isdir
+    command: mv /etc/nginx/conf.d/* /etc/nginx/backup/{{ ansible_date_time.iso8601 }}/
+    when: nginx_vhosts.stat.exists and nginx_vhosts.stat.isdir
 
 - name: Override nginx.conf config
   template:
