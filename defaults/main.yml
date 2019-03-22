@@ -21,3 +21,16 @@ nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
 
 nginx_apm_log_enabled: true
 nginx_status_enabled: true
+
+
+# Config vhosts 
+
+static_site_enabled: true
+static_site_server_name: "nfq.asia"
+static_site_root: "/var/www/static-frontend/current"
+static_site_index: "/index.html"
+static_site_access_log: "/var/log/nginx/static-frontend.access.log"
+static_site_error_log: "/var/log/nginx/static-frontend.error.log"
+static_cors_enabled: true
+
+

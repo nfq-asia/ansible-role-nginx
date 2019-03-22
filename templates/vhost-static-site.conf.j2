@@ -1,0 +1,34 @@
+server {
+  listen 80;
+  server_name {{ static_site_server_name }};
+  root {{ static_site_root }};
+
+  access_log  {{ static_site_access_log }} apm;
+  error_log   {{ static_site_error_log }};
+
+  location / {
+    try_files $uri {{ static_site_index }};
+
+{% if static_cors_enabled %}
+    add_header 'Access-Control-Allow-Origin' '*';
+    add_header 'Access-Control-Allow-Methods' 'GET, PUT, POST, DELETE, HEAD, OPTIONS' always;
+    add_header 'Access-Control-Allow-Credentials' 'true' always;
+    add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With';
+    add_header 'Access-Control-Allow-Headers' '*';
+{% endif %}
+
+    }
+  }
+
+  # Do not cache service worker sw.js, required for offline-first updates.
+  location /sw.js {
+    add_header Cache-Control "no-cache";
+    proxy_cache_bypass $http_pragma;
+    proxy_cache_revalidate on;
+    expires off;
+  }
+
+  location ~ ^.+\..+$ {
+    try_files $uri =404;
+  }
+}

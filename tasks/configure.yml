@@ -36,10 +36,11 @@
     - /etc/nginx/sites-available
     - /etc/nginx/sites-enabled
 
-- name: Config vhosts
-  copy:
-    src: files/
-    dest: /etc/nginx/conf.d/
+- name: Config vhosts - static site
+  template:
+    src: "vhost-static-site.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ static_site_server_name }}.conf"
+  when: static_site_enabled
   notify:
     - validate nginx
     - reload nginx
