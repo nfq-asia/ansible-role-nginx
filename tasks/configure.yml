@@ -1,20 +1,20 @@
 ---
 - name: Backup current configs on nginx
   block:
-  - name: Backup | Make directory for backup 
+  - name: Backup - make directory for backup
     file:
       path: /etc/nginx/backup
       state: directory
-  - name: Backup | Check stats of nginx.conf
+  - name: Backup - check stats of nginx.conf
     stat: path=/etc/nginx/nginx.conf
     register: nginx_core
-  - name: Backup | Backing up nginx.conf
+  - name: Backup - backing up nginx.conf
     command: mv /etc/nginx/nginx.conf /etc/nginx/backup/nginx.conf-backup{{ ansible_date_time.iso8601 }}
     when: nginx_core.stat.exists
-  - name: Backup | Check stats of conf.d
+  - name: Backup - check stats of conf.d
     stat: path=/etc/nginx/conf.d
     register: nginx_vhosts
-  - name: Backup | Backing up conf.g 
+  - name: Backup - backing up conf.g
     command: mv /etc/nginx/conf.d /etc/nginx/backup/conf.d-backup{{ ansible_date_time.iso8601 }}
     when: nginx_vhosts.stat.exists  and nginx_vhosts.stat.isdir
 
@@ -37,8 +37,8 @@
     - /etc/nginx/sites-enabled
 
 - name: Config vhosts
-  copy: 
-    src: ../files/
+  copy:
+    src: files/
     dest: /etc/nginx/conf.d/
   notify:
    - validate nginx
@@ -48,5 +48,5 @@
   meta: flush_handlers
 
 - name: Debug ansible gathering facts on remote machine
-  debug: 
+  debug:
     var: ansible_facts
