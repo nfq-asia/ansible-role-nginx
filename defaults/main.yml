@@ -19,13 +19,16 @@ nginx_server_tokens: "off"
 # Dropping SSLv3, ref: POODLE
 nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
 
+# Must enable apm log format by default
 nginx_apm_log_enabled: true
+
+# Must enable nginx status by default
 nginx_status_enabled: true
 
 
 # Config vhosts 
 
-# Vhost - static site (ie: react frontend)
+# 1. Vhost - static site (ie: react frontend)
 static_site_enabled: true
 static_site_server_name: "nfq.asia"
 static_site_root: "/var/www/static-frontend/current"
@@ -34,7 +37,7 @@ static_site_access_log: "/var/log/nginx/static-frontend.access.log"
 static_site_error_log: "/var/log/nginx/static-frontend.error.log"
 static_site_cors_enabled: true
 
-# Vhost - reverse proxy to port tcp:xxx (ie: nodejs backend)
+# 2. Vhost - reverse proxy to port tcp:xxx (ie: nodejs backend)
 reverse_proxy_enabled: true
 reverse_proxy_server_name: "api.nfq.asia"
 reverse_proxy_pass: "http://127.0.0.1:9000"
@@ -42,3 +45,13 @@ reverse_proxy_access_log: "/var/log/nginx/nodejs-backend.access.log"
 reverse_proxy_error_log: "/var/log/nginx/nodejs-backend.error.log"
 reverse_proxy_cors_enabled: true
 reverse_proxy_nocache_enabled: true
+
+# 3. Vhost - php-fpm to port tcp:9000
+php_fpm_enabled: true
+php_fpm_server_name: "backend.nfq.asia"
+php_fpm_root: "/var/www/backend-symfony/current/web"
+php_fpm_pass: "127.0.0.1:9000"
+php_fpm_index: "app.php"
+php_fpm_access_log: "/var/log/nginx/php-fpm-backend.access.log"
+php_fpm_error_log: "/var/log/nginx/php-fpm-backend.error.log"
+php_fpm_status_enabled: true

@@ -1,0 +1,46 @@
+server {
+  listen 80;
+  server_name {{ php_fpm_server_name }};
+
+  root {{ php_fpm_root }};
+
+  access_log  {{ php_fpm_access_log }} apm;
+  error_log   {{ php_fpm_error_log }};
+
+  rewrite     ^/(app)\.php/?(.*)$ /$1 permanent;
+
+  location / {
+    index        {{ php_fpm_index }};
+    try_files    $uri @rewriteapp;
+  }
+
+  location @rewriteapp {
+    rewrite     ^(.*)$ /{{ php_fpm_index }}/$1 last;
+  }
+
+  location ~ ^/(index|info|app|config)\.php(/|$) {
+    fastcgi_pass            {{ php_fpm_pass }};
+    fastcgi_buffer_size     16k;
+    fastcgi_buffers         4 16k;
+    fastcgi_split_path_info ^(.+\.php)(/.*)$;
+    include                 fastcgi_params;
+    fastcgi_param           SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param           HTTPS           off;
+  }
+}
+
+{% if php_fpm_status_enabled %}
+server {
+  listen 80;
+  server_name localhost;
+  location ~ ^/(status|ping)$ {
+    access_log off;
+    allow 127.0.0.1;
+    deny all;
+    include fastcgi_params;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_pass {{ php_fpm_pass }};
+  }
+}
+{% endif %}

@@ -1,25 +1,25 @@
 ---
 - name: Backup current configs on nginx
   block:
-  - name: Backup - make directory for backup
+  - name: Backup - make directory for backup at /etc/nginx/.backup
     file:
-      path: /etc/nginx/backup
+      path: /etc/nginx/.backup
       state: directory
   - name: Backup - create specific backup dir for this running
     file:
-      path: /etc/nginx/backup/{{ ansible_date_time.iso8601 }}
+      path: /etc/nginx/.backup/{{ ansible_date_time.iso8601 }}
       state: directory
   - name: Backup - check stats of nginx.conf
     stat: path=/etc/nginx/nginx.conf
     register: nginx_core
   - name: Backup - backing up nginx.conf
-    command: mv /etc/nginx/nginx.conf /etc/nginx/backup/{{ ansible_date_time.iso8601 }}/nginx.conf
+    command: mv /etc/nginx/nginx.conf /etc/nginx/.backup/{{ ansible_date_time.iso8601 }}/nginx.conf
     when: nginx_core.stat.exists
   - name: Backup - check stats of conf.d
     stat: path=/etc/nginx/conf.d
     register: nginx_vhosts
   - name: Backup - backing up conf.d
-    command: mv /etc/nginx/conf.d /etc/nginx/backup/{{ ansible_date_time.iso8601 }}/
+    command: mv /etc/nginx/conf.d /etc/nginx/.backup/{{ ansible_date_time.iso8601 }}/
     when: nginx_vhosts.stat.exists and nginx_vhosts.stat.isdir
   - name: Backup - init base conf.d
     file:
@@ -61,6 +61,15 @@
     src: "vhost-reverse-proxy.conf.j2"
     dest: "/etc/nginx/conf.d/{{ reverse_proxy_server_name }}.conf"
   when: reverse_proxy_enabled
+  notify:
+    - validate nginx
+    - reload nginx
+
+- name: Config vhosts - php-fpm
+  template:
+    src: "vhost-php-fpm.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ php_fpm_server_name }}.conf"
+  when: php_fpm_enabled
   notify:
     - validate nginx
     - reload nginx
