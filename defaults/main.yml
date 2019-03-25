@@ -25,8 +25,7 @@ nginx_apm_log_enabled: true
 # Must enable nginx status by default
 nginx_status_enabled: true
 
-
-# Config vhosts 
+# ============================ Config vhosts ============================
 
 # 1. Vhost - static site (ie: react frontend)
 static_site_enabled: true
