@@ -31,6 +31,7 @@ The task is to write an Ansible role to install and manage Nginx stable version 
           - apply APM log format
       - _advanced_:
           - Flexible configure by editing config files, default variables on this repo
+          - Automatically backing up old configurations before applying new ones at `/etc/nginx/.backup/` directory (hidden)
   - **Monitoring**:
       - _default_: discuss in monitoring parts
       - _optional_: discuss in monitoring parts
