@@ -18,10 +18,10 @@ server {
     rewrite     ^(.*)$ /{{ php_fpm_index }}/$1 last;
   }
 
-  location ~ ^/(index|info|app|config)\.php(/|$) {
+  location ~ ^/(index|app)\.php(/|$) {
     fastcgi_pass            {{ php_fpm_pass }};
-    fastcgi_buffer_size     16k;
-    fastcgi_buffers         4 16k;
+    fastcgi_buffer_size     4k;
+    fastcgi_buffers         8 4k;
     fastcgi_split_path_info ^(.+\.php)(/.*)$;
     include                 fastcgi_params;
     fastcgi_param           SCRIPT_FILENAME $document_root$fastcgi_script_name;
