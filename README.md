@@ -32,6 +32,14 @@ The task is to write an Ansible role to install and manage Nginx stable version 
       - _advanced_:
           - Flexible configure by editing config files, default variables on this repo
           - Automatically backing up old configurations before applying new ones at `/etc/nginx/.backup/` directory (hidden)
+          - Support checking nginx status by using `/nginx_status`
+          ```
+          curl 127.0.0.1:80/nginx_status
+          ```
+          - Support checking other status/ping like php-fpm by using `/php_fpm_ping` & `/php_fpm_status`
+          ```
+          curl 127.0.0.1:80/php_fpm_status
+          ```
   - **Monitoring**:
       - _default_: discuss in monitoring parts
       - _optional_: discuss in monitoring parts
