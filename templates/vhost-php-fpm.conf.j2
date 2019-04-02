@@ -33,7 +33,7 @@ server {
 server {
   listen 80;
   server_name localhost;
-  location ~ ^/(status|ping)$ {
+  location ~ ^/(php_fpm_status|php_fpm_ping)$ {
     access_log off;
     allow 127.0.0.1;
     deny all;
