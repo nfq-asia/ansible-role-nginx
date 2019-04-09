@@ -4,4 +4,28 @@
   gather_facts: true
 
   roles:
-    - ansible-role-nginx
+    - role: ansible-role-nginx
+      vars:
+        static_site_enabled: true
+        static_site_server_name: "nfq.asia"
+        static_site_root: "/var/www/static-frontend/current"
+        static_site_index: "/index.html"
+        static_site_access_log: "/var/log/nginx/static-frontend.access.log"
+        static_site_error_log: "/var/log/nginx/static-frontend.error.log"
+
+        reverse_proxy_enabled: true
+        reverse_proxy_server_name: "api.nfq.asia"
+        reverse_proxy_pass: "http://127.0.0.1:9000"
+        reverse_proxy_access_log: "/var/log/nginx/nodejs-backend.access.log"
+        reverse_proxy_error_log: "/var/log/nginx/nodejs-backend.error.log"
+        reverse_proxy_cors_enabled: true
+        reverse_proxy_nocache_enabled: true
+
+        php_fpm_enabled: true
+        php_fpm_server_name: "backend.nfq.asia"
+        php_fpm_root: "/var/www/backend-symfony/current/web"
+        php_fpm_pass: "127.0.0.1:9000"
+        php_fpm_index: "app.php"
+        php_fpm_access_log: "/var/log/nginx/php-fpm-backend.access.log"
+        php_fpm_error_log: "/var/log/nginx/php-fpm-backend.error.log"
+        php_fpm_status_enabled: true
