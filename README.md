@@ -1,3 +1,4 @@
+
 ## Ansible Nginx
 
 ### A. Purpose
@@ -46,7 +47,52 @@ The task is to write an Ansible role to install and manage Nginx stable version 
 
 ---
 ### Defaults
+
 ### Required variables
+* `nginx_user` - user of nginx service, default is `www-data`.
+
 ### Optional variables
+* `static_site_enabled` - used to config vhost file for static site (ie: react frontend), default is `true`.
+    - List variables required for vhost statis site:
+
+    ```yaml
+    static_site_server_name:
+    static_site_root:
+    static_site_index:
+    static_site_access_log:
+    static_site_error_log:
+    static_site_cors_enabled: true
+
+    ```
+* `reverse_proxy_enabled` -  used to config vhost file for reverse proxy to port tcp:xxx (ie: nodejs backend), default is `true`.
+    - List variables required for vhost reverse proxy:
+
+    ```yaml
+    reverse_proxy_server_name:
+    reverse_proxy_pass:
+    reverse_proxy_access_log:
+    reverse_proxy_error_log:
+    reverse_proxy_cors_enabled: true
+    reverse_proxy_nocache_enabled: true
+
+    ```
+
+* `php_fpm_enabled` - used to config vhost file php-fpm to port tcp:9000, default is `true`.
+	- List variables required for vhost php-fpm:
+
+    ```yaml
+    php_fpm_server_name:
+    php_fpm_root:
+    php_fpm_pass:
+    php_fpm_index:
+    php_fpm_access_log:
+    php_fpm_error_log:
+    php_fpm_status_enabled: true
+
+    ```
 ### Tags
+* `install` - install Nginx service.
+* `configure` - config Nginx service.
 ### Notes
+
+* Ansible-role-nginx just support creating only one vhost file for each types (static file, reverse proxy and php-fpm).
