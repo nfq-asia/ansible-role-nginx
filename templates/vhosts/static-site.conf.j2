@@ -1,0 +1,25 @@
+server {
+
+  {% include 'vhosts/common.server.j2' %}
+
+  root {{ item.root }};
+
+  location / {
+    index {{ item.index }};
+    try_files $uri {{ item.index }};
+
+    {% if item.cors is defined and item.cors %}
+      {% include 'vhosts/cors.location.j2' %}
+    {% endif %}
+  }
+
+  location ~ ^.+\..+$ {
+    try_files $uri =404;
+  }
+
+  {% if item.extra_config is defined %}
+    {% for file in item.extra_config %}
+      {% include file %}
+    {% endfor %}
+  {% endif %}
+}

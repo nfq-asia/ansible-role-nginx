@@ -1,0 +1,5 @@
+  listen 80;
+  server_name {{ item.server_name }};
+
+  access_log  {{ item.access_log }} apm;
+  error_log   {{ item.error_log }};

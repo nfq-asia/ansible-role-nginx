@@ -1,0 +1,7 @@
+# Do not cache service worker sw.js, required for offline-first updates.
+location /sw.js {
+  add_header Cache-Control "no-cache";
+  proxy_cache_bypass $http_pragma;
+  proxy_cache_revalidate on;
+  expires off;
+}

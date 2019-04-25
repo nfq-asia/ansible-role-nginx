@@ -28,16 +28,7 @@
       owner: root
       group: root
       mode: 0755
-
-- name: Override nginx.conf config
-  template:
-    src: "nginx.conf.j2"
-    dest: "/etc/nginx/nginx.conf"
-  notify:
-    - validate nginx
-
-- name: force all notified handlers to run at this point, for validating nginx.conf
-  meta: flush_handlers
+  when: backup_old_config
 
 - name: Remove sites-available and sites-enabled because of using /etc/nginx/conf.d/
   file:
@@ -47,36 +38,19 @@
     - /etc/nginx/sites-available
     - /etc/nginx/sites-enabled
 
-- name: Config vhosts - static site
+- name: Override nginx.conf config
   template:
-    src: "vhost-static-site.conf.j2"
-    dest: "/etc/nginx/conf.d/{{ static_site_server_name }}.conf"
-  when: static_site_enabled
-  notify:
-    - validate nginx
-    - reload nginx
+    src: "nginx.conf.j2"
+    dest: "/etc/nginx/nginx.conf"
 
-- name: Config vhosts - reverse proxy
+- name: Configure vhosts
   template:
-    src: "vhost-reverse-proxy.conf.j2"
-    dest: "/etc/nginx/conf.d/{{ reverse_proxy_server_name }}.conf"
-  when: reverse_proxy_enabled
-  notify:
-    - validate nginx
-    - reload nginx
-
-- name: Config vhosts - php-fpm
-  template:
-    src: "vhost-php-fpm.conf.j2"
-    dest: "/etc/nginx/conf.d/{{ php_fpm_server_name }}.conf"
-  when: php_fpm_enabled
+    src: "vhosts/{{ item.type }}.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ item.server_name }}.conf"
+  with_items: "{{ vhosts }}"
   notify:
     - validate nginx
     - reload nginx
 
 - name: force all notified handlers to run at this point, for applying all nginx configs
   meta: flush_handlers
-
-- name: Debug ansible gathering facts on remote machine
-  debug:
-    var: ansible_facts
