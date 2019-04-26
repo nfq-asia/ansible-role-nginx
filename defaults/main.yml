@@ -1,7 +1,7 @@
 ---
 # Defaults file for ansible-role-nginx
 
-backup_old_config: false
+backup_old_config: true
 
 nginx_user: "www-data"
 nginx_worker_processes: "auto"
@@ -21,39 +21,34 @@ nginx_server_tokens: "off"
 # Dropping SSLv3, ref: POODLE
 nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
 
-# Must enable apm log format by default
+# Enable apm log format by default
 nginx_apm_log_enabled: true
-
-# Must enable nginx status by default
-nginx_status_enabled: true
 
 # ============================ Config vhosts ============================
 
 vhosts:
   # 1. Vhost - static site (ie: react frontend)
-  - server_name: "nfq.asia"
+  - server_name: "change.me"
     type: "static-site"
     root: "/var/www/static-frontend/current"
     index: "/index.html"
-    access_log: "/var/log/nginx/static-frontend.access.log"
-    error_log: "/var/log/nginx/static-frontend.error.log"
+    access_log: "/var/log/nginx/change-me.access.log"
+    error_log: "/var/log/nginx/change-me.error.log"
     cors_enabled: true
-  
   # 2. Vhost - reverse proxy to port tcp:xxx (ie: nodejs backend)
-  - server_name: "api.nfq.asia"
+  - server_name: "api.change.me"
     type: "reverse-proxy"
-    access_log: "/var/log/nginx/nodejs-backend.access.log"
-    error_log: "/var/log/nginx/nodejs-backend.error.log"
+    access_log: "/var/log/nginx/api-change-me.access.log"
+    error_log: "/var/log/nginx/api-change-me.error.log"
     cors_enabled: true
     reverse_proxy_pass: "http://127.0.0.1:9000"
     reverse_proxy_nocache_enabled: true
-  
   # 3. Vhost - php-fpm to port tcp:9000
-  - server_name: "backend.nfq.asia"
+  - server_name: "api.php.change.me"
     type: "php-fpm"
     root: "/var/www/backend-symfony/current/web"
     index: "app.php"
-    access_log: "/var/log/nginx/php-fpm-backend.access.log"
-    error_log: "/var/log/nginx/php-fpm-backend.error.log"
+    access_log: "/var/log/nginx/api-php-change-me.access.log"
+    error_log: "/var/log/nginx/api-php-change-me.error.log"
     php_fpm_pass: "127.0.0.1:9000"
     php_fpm_status_enabled: true

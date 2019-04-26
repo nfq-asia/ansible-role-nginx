@@ -1,98 +1,110 @@
+# Ansible Nginx
 
-## Ansible Nginx
+## Description
+The task is to write an Ansible role to install and manage Nginx, with the latest stable version on Ubuntu 18.04
 
-### A. Purpose
+## Prerequisites
+* An EC2 instance with a static IP mapped to a hostname
+* Security group for this EC2 with opened port `tcp:80`
 
-The task is to write an Ansible role to install and manage Nginx stable version (1.14.2)
+## Required variables
 
-### B. Specifications
+Each vhosts is passed as an item in the array `vhosts` (see [test](tests/test.yml) for examples). Each item must have a `type` that is 1 in 3 types:
 
-1. Input
-    - Provide each nginx config file in this repo
-    - Apply one by one for each config files into directory `/etc/nginx/conf.d/`
-    - Only listen on `tcp:80` as default, not `tcp:443`
-    - No SSL/HTTPs cert because we should manage it on AWS ALB (with ACM)
+* `type: "static-site"`: Serving a static site, with all requests routed to the index file. Useful for ReactJS frontend.
+* `type: "reverse-proxy"`: Will do a proxy-pass to another IP:Port. Useful to act as a reverse proxy for Node.JS.
+* `type: "php-fpm"`: Act as FPM-FPM Gateway for a PHP-FPM backend.
 
-2. Prerequisites
-    - An EC2 instance with a static IP mapped to a hostname
-    - Security group for this EC2 with opened port `tcp:80`
+The following options are common for each types:
 
-3. Output
-  - **Connectivity**:
-      - _external_:
-          - receive request from port `tcp:443` on ALB Listeners. 301 Redirection is assumed to be handled in ALB.
-          - then routing from ALB to `tcp:80` of EC2 vm, nginx handling
-      - _internal_: within AWS private subnet:
-          - port: `tcp:80` as nginx
-          - proxy pass from nginx to other services inside EC2 vm (backend api, admin, ...)
-  - **Configuration**:
-      - _default_:
-          - all default configurations as the original of nginx
-          - apply auto tuning for nginx.conf (worker_processes, worker_cpu_affinity, ...)
-          - apply APM log format
-      - _advanced_:
-          - Flexible configure by editing config files, default variables on this repo
-          - Automatically backing up old configurations before applying new ones at `/etc/nginx/.backup/` directory (hidden)
-          - Support checking nginx status by using `/nginx_status`
-          ```
-          curl 127.0.0.1:80/nginx_status
-          ```
-          - Support checking other status/ping like php-fpm by using `/php_fpm_ping` & `/php_fpm_status`
-          ```
-          curl 127.0.0.1:80/php_fpm_status
-          ```
-  - **Monitoring**:
-      - _default_: discuss in monitoring parts
-      - _optional_: discuss in monitoring parts
+* `access_log`, `error_log`: Log paths for the vhosts
+* `root`: The webroot for the vhost. Does not do anything for type `reverse-proxy`
+* `index`: Index file. Does not do anything for type `reverse-proxy`
+* `cors`: Whether to enable CORS for *all* incoming requests. Note: This should be used in non-production only. Cross-Origin *should* be handled at the application level
 
----
-### Defaults
+### extra_config
 
-### Required variables
-* `nginx_user` - user of nginx service, default is `www-data`.
+Each item can take an `extra_config` variable, which is a list of extra files that will be automatically appended to the end of the `server { ... }``` block of that vhost.
 
-### Optional variables
-* `static_site_enabled` - used to config vhost file for static site (ie: react frontend), default is `true`.
-    - List variables required for vhost statis site:
+### Examples
+```yaml
+vhosts:
+  # Vhost - static site
+  - server_name: "nfq.asia"
+    type: "static-site"
+    root: "/var/www/static-frontend/current"
+    index: "/index.html"
+    access_log: "/var/log/nginx/static-frontend.access.log"
+    error_log: "/var/log/nginx/static-frontend.error.log"
+    cors: true
 
-    ```yaml
-    static_site_server_name:
-    static_site_root:
-    static_site_index:
-    static_site_access_log:
-    static_site_error_log:
-    static_site_cors_enabled: true
+  # Vhost with an extra config files
+  - server_name: "staging.nfq.asia"
+    type: "static-site"
+    root: "/var/www/static-a-frontend/current"
+    index: "/index.html"
+    access_log: "/var/log/nginx/static-frontend-2.access.log"
+    error_log: "/var/log/nginx/static-frontend-2.error.log"
+    extra_config:
+      - "files/service-worker.j2"
 
-    ```
-* `reverse_proxy_enabled` -  used to config vhost file for reverse proxy to port tcp:xxx (ie: nodejs backend), default is `true`.
-    - List variables required for vhost reverse proxy:
+  # Vhost - reverse proxy to port 9000
+  - server_name: "api.nfq.asia"
+    type: "reverse-proxy"
+    access_log: "/var/log/nginx/nodejs-backend.access.log"
+    error_log: "/var/log/nginx/nodejs-backend.error.log"
+    cors_enabled: true
+    reverse_proxy_pass: "http://127.0.0.1:9000"
+    nocache: true
 
-    ```yaml
-    reverse_proxy_server_name:
-    reverse_proxy_pass:
-    reverse_proxy_access_log:
-    reverse_proxy_error_log:
-    reverse_proxy_cors_enabled: true
-    reverse_proxy_nocache_enabled: true
+  # 3. Vhost - php-fpm to port tcp:9000
+  - server_name: "backend.nfq.asia"
+    type: "php-fpm"
+    root: "/var/www/backend-symfony/current/web"
+    index: "app.php"
+    access_log: "/var/log/nginx/php-fpm-backend.access.log"
+    error_log: "/var/log/nginx/php-fpm-backend.error.log"
+    cors: true
+    php_fpm_pass: "127.0.0.1:9000"
+    php_fpm_status: true
+```
 
-    ```
+## Defaults
 
-* `php_fpm_enabled` - used to config vhost file php-fpm to port tcp:9000, default is `true`.
-	- List variables required for vhost php-fpm:
+* List of default parameters, mostly for tuning:
 
-    ```yaml
-    php_fpm_server_name:
-    php_fpm_root:
-    php_fpm_pass:
-    php_fpm_index:
-    php_fpm_access_log:
-    php_fpm_error_log:
-    php_fpm_status_enabled: true
+```yaml
+nginx_user: "www-data"
+nginx_worker_processes: "auto"
+nginx_worker_cpu_affinity: "auto"
+nginx_worker_rlimit_nofile: "100000"
+nginx_worker_connections: "4096"
 
-    ```
-### Tags
+nginx_keepalive_timeout: "100"
+nginx_client_body_timeout: "120"
+nginx_reset_timedout_connection: "on"
+nginx_types_hash_max_size: "2048"
+nginx_client_max_body_size: "50M"
+```
+
+* `nginx_server_tokens: "off"`: Hide nginx version number
+* `nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"`: Dropping SSLv3, ref: POODLE
+* `nginx_apm_log_enabled: true`: Enable apm log format by default
+
+## Optional variables
+* `backup_old_config: true`: Automatically backing up old configurations before applying new ones at `/etc/nginx/.backup/` directory
+
+## Tags
 * `install` - install Nginx service.
 * `configure` - config Nginx service.
-### Notes
 
-* Ansible-role-nginx just support creating only one vhost file for each types (static file, reverse proxy and php-fpm).
+## Notes
+
+* The role does not handle TLS and HTTP->HTTPS Redirection by default since these are assumed to be handled by ALB.
+* There is some tuning on nginx done (worker_processes, worker_cpu_affinity, etc.) as per the configuration [here](templates/nginx.conf.j2)
+* The access log are in [APM format](https://www.nginx.com/blog/using-nginx-logging-for-application-performance-monitoring/)
+* Nginx status can be checked with the endpoint `/nginx_status`:
+
+```
+curl 127.0.0.1:80/nginx_status
+```
