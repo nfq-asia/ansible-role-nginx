@@ -53,7 +53,7 @@ vhosts:
     type: "reverse-proxy"
     access_log: "/var/log/nginx/nodejs-backend.access.log"
     error_log: "/var/log/nginx/nodejs-backend.error.log"
-    cors_enabled: true
+    cors: true
     reverse_proxy_pass: "http://127.0.0.1:9000"
     nocache: true
 
