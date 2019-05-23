@@ -3,23 +3,18 @@ server {
   {% include 'vhosts/common.server.j2' %}
 
   root {{ item.root }};
+  index        {{ item.index }};
 
-  rewrite     ^/({{ item.root }})\.php/?(.*)$ /$1 permanent;
 
   location / {
-    index        {{ item.index }};
-    try_files    $uri @rewriteapp;
+    try_files    $uri /index.php$args;
 
     {% if item.cors is defined and item.cors %}
       {% include 'vhosts/cors.location.j2' %}
     {% endif %}
   }
 
-  location @rewriteapp {
-    rewrite     ^(.*)$ /{{ item.index }}/$1 last;
-  }
-
-  location ~ ^/({{ item.index }})\.php(/|$) {
+  location ~ \.php(/|$) {
     fastcgi_pass            {{ item.php_fpm_pass }};
     fastcgi_buffer_size     4k;
     fastcgi_buffers         8 4k;

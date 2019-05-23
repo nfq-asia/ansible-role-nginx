@@ -1,7 +1,7 @@
 ---
 # Defaults file for ansible-role-nginx
 
-backup_old_config: true
+backup_old_config: false
 
 nginx_user: "www-data"
 nginx_worker_processes: "auto"
@@ -23,6 +23,7 @@ nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
 
 # Enable apm log format by default
 nginx_apm_log_enabled: true
+nginx_status_enabled: false
 
 # ============================ Config vhosts ============================
 
