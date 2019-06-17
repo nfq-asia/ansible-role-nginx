@@ -1,11 +1,11 @@
 server {
-  {% include 'vhosts/common.server.j2' %}
+{% include 'vhosts/common.server.j2' %}
 
-  {% if item.nocache is defined and item.nocache%}
-    add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
-    add_header Pragma 'no-cache';
-    add_header Expires 0;
-  {% endif %}
+{% if item.reverse_proxy_nocache_enabled is defined and item.reverse_proxy_nocache_enabled %}
+  add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+  add_header Pragma 'no-cache';
+  add_header Expires 0;
+{% endif %}
 
   location / {
     proxy_set_header X-Real-IP $remote_addr;
@@ -13,7 +13,7 @@ server {
     proxy_set_header Host $host;
     proxy_pass {{ item.reverse_proxy_pass }};
 
-    {% if item.cors is defined and item.cors %}
+    {% if item.cors_enabled is defined and item.cors_enabled %}
       {% include 'vhosts/cors.location.j2' %}
     {% endif %}
   }

@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  author: Hieu Huynh
+  author: Hieu Huynh from devops-team
   description: Ansible playbook to setup Nginx stable version
   company: NFQ.asia
   platforms:

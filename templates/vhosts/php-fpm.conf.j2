@@ -36,7 +36,7 @@ server {
 
 }
 
-{% if item.php_fpm_status_enabled %}
+{% if item.php_fpm_status_enabled is defined and item.php_fpm_status_enabled %}
 server {
   listen 80;
   server_name localhost;

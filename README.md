@@ -55,7 +55,7 @@ vhosts:
     error_log: "/var/log/nginx/nodejs-backend.error.log"
     cors_enabled: true
     reverse_proxy_pass: "http://127.0.0.1:9000"
-    nocache: true
+    reverse_proxy_nocache_enabled: true
 
   # 3. Vhost - php-fpm to port tcp:9000
   - server_name: "backend.nfq.asia"
