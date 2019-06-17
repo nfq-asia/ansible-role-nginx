@@ -1,5 +1,4 @@
 server {
-
 {% include 'vhosts/common.server.j2' %}
 
   root   {{ item.root }};
@@ -12,6 +11,7 @@ server {
 {% if item.cors_enabled is defined and item.cors_enabled %}
     {% include 'vhosts/cors.location.j2' %}
 {% endif %}
+
   }
 
   location @rewriteapp {
@@ -28,11 +28,12 @@ server {
     fastcgi_param           HTTPS           off;
   }
 
-  {% if item.extra_config is defined %}
+{% if item.extra_config is defined %}
     {% for file in item.extra_config %}
       {% include file %}
     {% endfor %}
-  {% endif %}
+{% endif %}
+
 }
 
 {% if item.php_fpm_status_enabled %}
