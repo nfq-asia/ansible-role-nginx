@@ -52,4 +52,5 @@ vhosts:
     access_log: "/var/log/nginx/api-php-change-me.access.log"
     error_log: "/var/log/nginx/api-php-change-me.error.log"
     php_fpm_pass: "127.0.0.1:9000"
+    cors_enabled: true
     php_fpm_status_enabled: true

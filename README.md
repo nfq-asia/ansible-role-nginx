@@ -36,7 +36,7 @@ vhosts:
     index: "/index.html"
     access_log: "/var/log/nginx/static-frontend.access.log"
     error_log: "/var/log/nginx/static-frontend.error.log"
-    cors: true
+    cors_enabled: true
 
   # Vhost with an extra config files
   - server_name: "staging.nfq.asia"
@@ -53,7 +53,7 @@ vhosts:
     type: "reverse-proxy"
     access_log: "/var/log/nginx/nodejs-backend.access.log"
     error_log: "/var/log/nginx/nodejs-backend.error.log"
-    cors: true
+    cors_enabled: true
     reverse_proxy_pass: "http://127.0.0.1:9000"
     nocache: true
 
@@ -64,9 +64,9 @@ vhosts:
     index: "app.php"
     access_log: "/var/log/nginx/php-fpm-backend.access.log"
     error_log: "/var/log/nginx/php-fpm-backend.error.log"
-    cors: true
+    cors_enabled: true
     php_fpm_pass: "127.0.0.1:9000"
-    php_fpm_status: true
+    php_fpm_status_enabled: true
 ```
 
 ## Defaults
