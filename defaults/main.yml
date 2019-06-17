@@ -23,7 +23,7 @@ nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
 
 # Enable apm log format by default
 nginx_apm_log_enabled: true
-nginx_status_enabled: false
+nginx_status_enabled: true
 
 # ============================ Config vhosts ============================
 
