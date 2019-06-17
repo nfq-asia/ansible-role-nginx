@@ -1,7 +1,7 @@
 ---
 # Defaults file for ansible-role-nginx
 
-backup_old_config: false
+backup_old_config: true
 
 nginx_user: "www-data"
 nginx_worker_processes: "auto"
