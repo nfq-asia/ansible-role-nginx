@@ -13,9 +13,10 @@ server {
     proxy_set_header Host $host;
     proxy_pass {{ item.reverse_proxy_pass }};
 
-    {% if item.cors_enabled is defined and item.cors_enabled %}
-      {% include 'vhosts/cors.location.j2' %}
-    {% endif %}
+{% if item.cors_enabled is defined and item.cors_enabled %}
+{% include 'vhosts/cors.location.j2' %}
+{% endif %}
+
   }
 
   {% if item.extra_config is defined %}
