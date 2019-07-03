@@ -46,7 +46,7 @@
 - name: Configure vhosts
   template:
     src: "vhosts/{{ item.type }}.conf.j2"
-    dest: "/etc/nginx/conf.d/{{ item.server_name }}.conf"
+    dest: "/etc/nginx/conf.d/{{ item.name | default(item.server_name) }}.conf"
   with_items: "{{ vhosts }}"
   notify:
     - validate nginx
