@@ -1,4 +1,4 @@
-  listen 80;
+  listen 80 {{ item.listen_parameters }};
   server_name {{ item.server_name }};
 
   {% if item.type == 'static-site'  %}
