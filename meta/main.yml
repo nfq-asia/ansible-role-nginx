@@ -14,4 +14,4 @@ dependencies:
   - src: git@git.nfq.asia:devops/ansible-role-common.git
     scm: git
     name: nfq.common
-    version: "1.1.0"
+    version: "1.2.1"
