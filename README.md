@@ -17,14 +17,21 @@ Just create a file config, for example to deploy laravel app you create a file c
 
 ```
 roles:
-    - role: ansible-role-nginx
-      vars:
-        force_use_external_vhost: true
-        vhost_directory: "./vhosts/"
+  - role: nfq.nginx
+    vars:
+      force_use_external_vhost: true
+      vhost_directory: "./vhosts/"
 ```
 if you want to see more details how to use it, take a look at repo https://git.nfq.asia/devops/infrastructure-standard
 
 ### Use internal vhost
+
+To use this option you need set variable force_use_external_vhost becomed false
+
+```
+force_use_external_vhost: false
+
+```
 
 #### Required variables
 
