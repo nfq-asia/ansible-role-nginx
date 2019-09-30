@@ -25,6 +25,9 @@ nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
 nginx_apm_log_enabled: true
 nginx_status_enabled: true
 
+force_use_external_vhost: true
+vhost_directory: "./vhosts/"
+
 # ============================ Config vhosts ============================
 
 vhosts:

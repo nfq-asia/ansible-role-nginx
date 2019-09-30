@@ -7,7 +7,33 @@ The task is to write an Ansible role to install and manage Nginx, with the lates
 * An EC2 instance with a static IP mapped to a hostname
 * Security group for this EC2 with opened port `tcp:80`
 
-## Required variables
+## Use
+
+To use this module we have two option:
+
+### Use external vhost
+
+Just create a file config, for example to deploy laravel app you create a file config like [this](./tests/vhosts/php-laravel.conf). Then define it into playbook something like that:
+
+```
+roles:
+  - role: nfq.nginx
+    vars:
+      force_use_external_vhost: true
+      vhost_directory: "./vhosts/"
+```
+if you want to see more details how to use it, take a look at repo https://git.nfq.asia/devops/infrastructure-standard
+
+### Use internal vhost
+
+To use this option you need set variable force_use_external_vhost becomed false
+
+```
+force_use_external_vhost: false
+
+```
+
+#### Required variables
 
 Each vhosts is passed as an item in the array `vhosts` (see [test](tests/test.yml) for examples). Each item must have a `type` that is 1 in 3 types:
 
@@ -25,6 +51,7 @@ The following options are common for each types:
 ### extra_config
 
 Each item can take an `extra_config` variable, which is a list of extra files that will be automatically appended to the end of the `server { ... }``` block of that vhost.
+
 
 ### Examples
 ```yaml

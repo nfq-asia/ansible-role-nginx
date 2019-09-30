@@ -43,11 +43,20 @@
     src: "nginx.conf.j2"
     dest: "/etc/nginx/nginx.conf"
 
-- name: Configure vhosts
+- name: Configure internal vhosts
   template:
     src: "vhosts/{{ item.type }}.conf.j2"
     dest: "/etc/nginx/conf.d/{{ item.server_name }}.conf"
   with_items: "{{ vhosts }}"
+  when: not force_use_external_vhost
+  notify:
+    - validate nginx
+    - reload nginx
+- name: Configure external vhosts
+  copy:
+    src: "{{ vhost_directory }}"
+    dest: "/etc/nginx/conf.d/"
+  when: force_use_external_vhost
   notify:
     - validate nginx
     - reload nginx
