@@ -40,7 +40,7 @@ your Pull Request to ensure it is accepted quickly.
    time for us to respond.
 
 4.  Once all outstanding comments have been addressed, your contribution will be
-   merged! You are able to apply the Terraform changes.
+   merged!
 
 5.  In rare cases, we might decide that a PR should be closed. We'll make sure
    to provide clear reasoning when this happens.
